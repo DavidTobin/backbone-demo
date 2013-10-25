@@ -29,8 +29,15 @@ var FormView = Backbone.View.extend(
 		 */
 		events: {
 			'click .submit': 'submit',
-			'click .cancel': 'cancel'
+			'click .cancel': 'cancel',			
+			'keyup .text': 'setTextChanged'
 		},
+
+		/**
+		 * Indicates whether text has been changed from it's original
+		 * @type Boolean
+	 	 */
+		textChanged: false,
 		
 		/**
 		 * View init method, subscribing to model events
@@ -38,6 +45,11 @@ var FormView = Backbone.View.extend(
 		initialize: function () {
 			this.model.on('change', this.updateFields, this);
 			this.model.on('destroy', this.remove, this);
+			this.model.on('cancel', this.cancel, this);	
+
+			this.model.on('error', function(model, error) {
+				alert(error);
+			});
 		},
 		
 		/**
@@ -50,7 +62,11 @@ var FormView = Backbone.View.extend(
 				author: this.model.get('author'),
 				text: this.model.get('text')
 			};
-			this.$el.html(Mustache.to_html(template, template_vars));
+			this.$el.html(Mustache.to_html(template, template_vars)).addClass('modal');
+
+			// We render the modal background			
+			$('.modal-background').show();			
+
 			return this;
 		},
 	
@@ -59,18 +75,30 @@ var FormView = Backbone.View.extend(
 		 * Sets new values from form on model, triggers a success event and cleans up the form
 		 * @returns {Boolean} Returns false to stop propagation
 		 */
-		submit: function () {
+		submit: function () {			
 			// set values from form on model
 			this.model.set({
 				author: this.$el.find('.author').val(),
 				text: this.$el.find('.text').val()
-			});
+			}, { validate: true });										
+
+			// We return if we don't pass validation
+			if (!this.model.isValid()) return false;
+
+			// Lets update local storage last author
+			localStorage.setItem('last-user', this.model.get('author'));
 			
+			// Update current default value on model for author
+			this.model.defaults.author = this.model.get('author');			
+
 			// set an id if model was a new instance
 			// note: this is usually done automatically when items are stored in an API
 			if (this.model.isNew()) {
-				this.model.id = Math.floor(Math.random() * 1000);
+				this.model.id = Math.floor(Math.random() * 1000);				
 			}
+
+			// Remove modal
+			$('.modal-background').hide();
 			
 			// trigger the 'success' event on form, with the returned model as the only parameter
 			this.trigger('success', this.model);
@@ -86,8 +114,15 @@ var FormView = Backbone.View.extend(
 		* @returns {Boolean} Returns false to stop propagation
 		*/
 		cancel: function () {
-			// clean up form
-			this.remove();
+			if (this.textChanged === false) {
+				// clean up form
+				this.remove();
+			} else {
+				// Cancel and lose changes?
+				if (confirm("Are you sure you want to cancel? Any changes will be lost.") === true) {
+					this.remove();
+				}
+			}
 			return false;
 		},
 		
@@ -102,6 +137,14 @@ var FormView = Backbone.View.extend(
 		},
 		
 		/**
+		 * Sets the text changed property		 		
+		 */
+		setTextChanged: function() {						
+			this.textChanged = true;			
+		},
+
+
+		/**
 		 * Override the default view remove method with custom actions
 		 */
 		remove: function () {
@@ -113,6 +156,9 @@ var FormView = Backbone.View.extend(
 			
 			// call backbones default view remove method
 			Backbone.View.prototype.remove.call(this);
+
+			// Remove any modal			
+			$('.modal-background').hide();			
 		}
 	}
 );

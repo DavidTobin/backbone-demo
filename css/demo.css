@@ -54,3 +54,25 @@ body {
 .commentform textarea, .commentform input {
 	width: 350px;
 }
+
+.modal {
+	position: fixed;
+	right: 0;
+	bottom: 0;
+	top: 0;
+	left: 0;
+	margin: auto;
+	height: 135px;
+	z-index: 999;
+}
+
+.modal-background {
+	display: none;
+	position: fixed;
+	left: 0;
+	top: 0;	
+	z-index: 2;
+	background: rgba(0,0,0,0.85);
+	width: 100%;
+	height: 100%;	
+}

@@ -11,6 +11,29 @@ var CommentModel = Backbone.Model.extend(
 /** @lends CommentModel.prototype */
 	{
 		/**
+		 * Default values
+		 */
+	  defaults: {
+	  	// Author default is taken from local storage
+	  	author: localStorage.getItem('last-user')
+	  },
+
+		/**
+		 * Validation
+		 */
+		validate: function(attrs, options) {						
+			if (!attrs.author) {
+				return "Please enter an author.";
+			}
+
+			if (!attrs.text) {
+				return "Please enter a comment.";
+			}
+
+			return false;
+		},
+
+		/**
 		 * Sample method to change the text of a comment model
 		 */
 		reverseText: function () {

@@ -37,10 +37,16 @@ var NewButtonView = Backbone.View.extend(
 		
 			// render form view right after new button
 			var formview = new FormView({model: comment});
-			this.$el.after(formview.render().$el);
+			this.$el.after(formview.render().$el);			
 		
 			// add saved model to collection after form was submitted successfully
 			formview.on('success', this.handleFormSuccess, this);
+
+			// Destroy on modal background click
+			var _this = this;
+			$('.modal-background').click(function() {
+				formview.model.trigger('cancel');
+			});
 		
 			// finally, return false to stop event propagation
 			return false;

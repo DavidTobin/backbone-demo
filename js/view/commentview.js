@@ -68,12 +68,18 @@ var CommentView = Backbone.View.extend(
 		 * @returns {Boolean} Returns false to stop propagation
 		 */
 		edit: function () {
+			// Trigger editing event to remove open forms
+			this.model.collection.trigger('editing');	
+
 			// create new FormView instance to edit the comment
-			var formview = new FormView({model: this.model});
-			
+			var formview = new FormView({model: this.model});					
+
 			// insert FormView instance after the comment container
 			this.$el.after(formview.render().$el);
 			
+			// Remove when a new form is open			
+			this.model.collection.on('editing', formview.remove, formview);
+
 			// listen to save success event to handle successful form submit event
 			formview.on('success', this.handleEditSuccess, this);
 			return false;
