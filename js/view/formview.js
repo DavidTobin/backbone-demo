@@ -75,7 +75,7 @@ var FormView = Backbone.View.extend(
 		 * Sets new values from form on model, triggers a success event and cleans up the form
 		 * @returns {Boolean} Returns false to stop propagation
 		 */
-		submit: function () {			
+		submit: function () {
 			// set values from form on model
 			this.model.set({
 				author: this.$el.find('.author').val(),
@@ -94,7 +94,7 @@ var FormView = Backbone.View.extend(
 			// set an id if model was a new instance
 			// note: this is usually done automatically when items are stored in an API
 			if (this.model.isNew()) {
-				this.model.id = Math.floor(Math.random() * 1000);				
+				this.model.id = Math.floor(Math.random() * 1000);
 			}
 
 			// Remove modal

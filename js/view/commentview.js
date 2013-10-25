@@ -80,6 +80,11 @@ var CommentView = Backbone.View.extend(
 			// Remove when a new form is open			
 			this.model.collection.on('editing', formview.remove, formview);
 
+			// Destroy on modal background click			
+			$('.modal-background').click(function() {				
+				formview.model.trigger('cancel');
+			});
+			
 			// listen to save success event to handle successful form submit event
 			formview.on('success', this.handleEditSuccess, this);
 			return false;
